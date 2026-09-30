@@ -48,11 +48,17 @@ def discover_melee(
 
 
 @app.command()
-def crawl(db: Path = DEFAULT_DB, raw_dir: Path = Path("data/raw"), delay: float = 5.0, refresh: bool = False) -> None:
+def crawl(
+    db: Path = DEFAULT_DB,
+    raw_dir: Path = Path("data/raw"),
+    delay: float = 5.0,
+    refresh: bool = False,
+    limit: int | None = typer.Option(None, "--limit", min=1),
+) -> None:
     """Fetch pending public URLs and archive their HTML."""
     if delay < 1:
         raise typer.BadParameter("Use a delay of at least one second for respectful collection.")
-    typer.echo(json.dumps(crawl_pending(db, raw_dir, delay, refresh), indent=2))
+    typer.echo(json.dumps(crawl_pending(db, raw_dir, delay, refresh, limit), indent=2))
 
 
 @app.command("report-quality")

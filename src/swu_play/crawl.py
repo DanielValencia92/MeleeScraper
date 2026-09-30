@@ -33,10 +33,23 @@ def import_urls(db_path: Path, input_path: Path, source: str) -> tuple[int, int]
     return import_url_values(db_path, input_path.read_text(encoding="utf-8").splitlines(), source)
 
 
-def crawl_pending(db_path: Path, raw_dir: Path, delay_seconds: float, refresh: bool = False) -> dict[str, int]:
+def crawl_pending(
+    db_path: Path,
+    raw_dir: Path,
+    delay_seconds: float,
+    refresh: bool = False,
+    limit: int | None = None,
+) -> dict[str, int]:
+    if limit is not None and limit < 1:
+        raise ValueError("limit must be at least one.")
     connection = connect(db_path)
     query = "SELECT url, source FROM discovered_urls" if refresh else "SELECT url, source FROM discovered_urls WHERE status != 'ok'"
-    rows = connection.execute(query).fetchall()
+    query += " ORDER BY first_seen, url"
+    parameters: tuple[int, ...] = ()
+    if limit is not None:
+        query += " LIMIT ?"
+        parameters = (limit,)
+    rows = connection.execute(query, parameters).fetchall()
     counts = {"attempted": 0, "ok": 0, "failed": 0}
     raw_dir.mkdir(parents=True, exist_ok=True)
     headers = {"User-Agent": "swu-play-analysis/0.1 (public research collector; contact repository owner)"}
