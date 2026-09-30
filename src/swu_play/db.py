@@ -21,6 +21,14 @@ CREATE TABLE IF NOT EXISTS events (
     payload_json TEXT NOT NULL,
     updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+CREATE TABLE IF NOT EXISTS melee_organizations (
+    organization_id INTEGER PRIMARY KEY,
+    name TEXT,
+    tournament_count INTEGER NOT NULL DEFAULT 0,
+    status TEXT NOT NULL DEFAULT 'pending',
+    last_scanned_at TEXT,
+    error TEXT
+);
 """
 
 
@@ -30,4 +38,3 @@ def connect(path: Path) -> sqlite3.Connection:
     connection.row_factory = sqlite3.Row
     connection.executescript(SCHEMA)
     return connection
-

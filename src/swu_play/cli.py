@@ -1,12 +1,15 @@
 import json
 import http.server
+from datetime import date
 from pathlib import Path
 import socketserver
 
+import httpx
 import typer
 
-from .crawl import crawl_pending, import_urls
+from .crawl import crawl_pending, import_url_values, import_urls
 from .exports import export_csv, quality_report, write_site_data
+from .melee import MeleePublicDiscovery
 
 app = typer.Typer(help="Collect and publish public SWU event research data.")
 DEFAULT_DB = Path("data/swu_play.sqlite3")
@@ -19,8 +22,33 @@ def discover(url_file: Path, source: str = "manual-public-url", db: Path = DEFAU
     typer.echo(f"Imported {added} URLs; skipped {duplicate} duplicates.")
 
 
+@app.command("discover-melee")
+def discover_melee(
+    max_organizations: int = 10,
+    from_date: str | None = typer.Option(None, "--from"),
+    to_date: str | None = typer.Option(None, "--to"),
+    db: Path = DEFAULT_DB,
+    delay: float = 5.0,
+) -> None:
+    """Find SWU events via Melee's public organization/tournament listings."""
+    try:
+        start = date.fromisoformat(from_date) if from_date else None
+        end = date.fromisoformat(to_date) if to_date else None
+    except ValueError as error:
+        raise typer.BadParameter("Dates must use YYYY-MM-DD.") from error
+    if start and end and start > end:
+        raise typer.BadParameter("--from must not be after --to.")
+    try:
+        with MeleePublicDiscovery(delay) as discovery:
+            result = discovery.discover(db, max_organizations, start, end)
+    except (httpx.HTTPError, RuntimeError, ValueError) as error:
+        raise typer.Exit(f"Melee discovery failed: {error}") from error
+    added, duplicates = import_url_values(db, result.urls, "melee-public-organization-listing")
+    typer.echo(f"Scanned {result.organizations_scanned} organizations; found {result.events_found} SWU events; imported {added}, skipped {duplicates} duplicates.")
+
+
 @app.command()
-def crawl(db: Path = DEFAULT_DB, raw_dir: Path = Path("data/raw"), delay: float = 2.5, refresh: bool = False) -> None:
+def crawl(db: Path = DEFAULT_DB, raw_dir: Path = Path("data/raw"), delay: float = 5.0, refresh: bool = False) -> None:
     """Fetch pending public URLs and archive their HTML."""
     if delay < 1:
         raise typer.BadParameter("Use a delay of at least one second for respectful collection.")

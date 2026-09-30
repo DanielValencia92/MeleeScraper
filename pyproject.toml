@@ -26,4 +26,3 @@ packages = ["src/swu_play"]
 [tool.pytest.ini_options]
 pythonpath = ["src"]
 testpaths = ["tests"]
-

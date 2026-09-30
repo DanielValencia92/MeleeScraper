@@ -10,11 +10,11 @@ from .db import connect
 from .parser import parse_public_page, record_json
 
 
-def import_urls(db_path: Path, input_path: Path, source: str) -> tuple[int, int]:
+def import_url_values(db_path: Path, urls: list[str], source: str) -> tuple[int, int]:
     connection = connect(db_path)
     added = duplicate = 0
-    for line in input_path.read_text(encoding="utf-8").splitlines():
-        url = line.strip()
+    for url in urls:
+        url = url.strip()
         if not url or url.startswith("#"):
             continue
         cursor = connection.execute(
@@ -27,6 +27,10 @@ def import_urls(db_path: Path, input_path: Path, source: str) -> tuple[int, int]
             connection.execute("UPDATE discovered_urls SET last_seen = CURRENT_TIMESTAMP WHERE url = ?", (url,))
     connection.commit()
     return added, duplicate
+
+
+def import_urls(db_path: Path, input_path: Path, source: str) -> tuple[int, int]:
+    return import_url_values(db_path, input_path.read_text(encoding="utf-8").splitlines(), source)
 
 
 def crawl_pending(db_path: Path, raw_dir: Path, delay_seconds: float, refresh: bool = False) -> dict[str, int]:
@@ -69,4 +73,3 @@ def crawl_pending(db_path: Path, raw_dir: Path, delay_seconds: float, refresh: b
             connection.commit()
             time.sleep(delay_seconds)
     return counts
-

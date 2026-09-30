@@ -17,19 +17,19 @@ python -m pip install -e ".[dev]"
 
 ## First collection
 
-Discovery is intentionally source-agnostic in the first milestone. Put one public event URL per line in a text file, then import and fetch it:
+Discover public Star Wars: Unlimited events directly from Melee's browser-visible event search, then fetch, archive, and report on them:
 
 ```powershell
-swu-play discover urls.txt
+swu-play discover-melee --max-organizations 10 --from 2025-08-01 --to 2025-08-31
 swu-play crawl
 swu-play report-quality
 swu-play export data/exports/events.csv
-swu-play build-site
+swu-play serve
 ```
 
-`crawl` uses a conservative default delay (2.5 seconds), retries transient failures, archives the response body, and skips unchanged successful records on subsequent runs. Use `--refresh` only when you deliberately want a new capture.
+Start with `--max-organizations 10` to validate the results. The first run caches Melee's public organization directory, then scans a bounded number of organizations in descending activity order. It resumes from its SQLite queue in later runs. The adapter filters the public tournament listings to SWU and an optional inclusive date window; it does not use Melee's authenticated API or access participant-level information. Both discovery and crawling use Melee's published five-second crawl delay, archive the response body, and skip unchanged successful records on subsequent runs. Use `--refresh` only when you deliberately want a new capture.
 
-The generic parser records Open Graph, JSON-LD, page title, visible text, and public event URLs. A source-specific adapter may later extract stronger fields from stable public HTML or documented public feeds. Do not add authenticated, private, or speculative endpoints.
+The generic parser records Open Graph, JSON-LD, page title, visible text, and public event URLs. The Melee discovery adapter is based on the same unauthenticated organization and tournament listings used by Melee's public pages. Do not add authenticated, private, or speculative endpoints.
 
 ## Local dashboard
 
