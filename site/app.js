@@ -4,12 +4,12 @@ const format = document.querySelector('#format');
 const search = document.querySelector('#search');
 
 function text(value) { return value ?? '—'; }
-function location(event) { return [event.city, event.region, event.country].filter(Boolean).join(', ') || '—'; }
+function eventLocation(event) { return [event.city, event.region, event.country].filter(Boolean).join(', ') || '—'; }
 function render(events) {
   eventBody.replaceChildren(...events.map(event => {
     const row = document.createElement('tr');
     const title = document.createElement('a'); title.href = event.url; title.textContent = text(event.name); title.target = '_blank'; title.rel = 'noreferrer';
-    const cells = [[title], [text(event.format_norm)], [location(event)], [text(event.player_count)], [text(event.source)]];
+    const cells = [[title], [text(event.format_norm)], [eventLocation(event)], [text(event.player_count)], [text(event.source)]];
     for (const contents of cells) { const cell = document.createElement('td'); contents.forEach(item => cell.append(item)); row.append(cell); }
     return row;
   }));
@@ -28,4 +28,3 @@ Promise.all([fetch('data/events.json').then(r => r.json()), fetch('data/summary.
     format.addEventListener('change', update); search.addEventListener('input', update); update();
   })
   .catch(() => { count.textContent = 'No published dataset yet. Run “swu-play build-site” after a collection.'; });
-
