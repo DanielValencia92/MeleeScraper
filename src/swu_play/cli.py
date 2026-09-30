@@ -1,5 +1,7 @@
 import json
+import http.server
 from pathlib import Path
+import socketserver
 
 import typer
 
@@ -39,7 +41,21 @@ def export(output: Path, db: Path = DEFAULT_DB) -> None:
 
 @app.command("build-site")
 def build_site(db: Path = DEFAULT_DB, site_dir: Path = Path("site")) -> None:
-    """Build JSON consumed by the static GitHub Pages dashboard."""
+    """Build JSON consumed by the static local dashboard."""
     count, _ = write_site_data(db, site_dir)
     typer.echo(f"Wrote public dashboard data for {count} events to {site_dir / 'data'}.")
 
+
+@app.command()
+def serve(db: Path = DEFAULT_DB, site_dir: Path = Path("site"), port: int = 8000) -> None:
+    """Build dashboard data and serve it locally until interrupted."""
+    if not 1 <= port <= 65535:
+        raise typer.BadParameter("Port must be between 1 and 65535.")
+    count, _ = write_site_data(db, site_dir)
+    handler = lambda *args, **kwargs: http.server.SimpleHTTPRequestHandler(*args, directory=str(site_dir), **kwargs)
+    with socketserver.ThreadingTCPServer(("127.0.0.1", port), handler) as server:
+        typer.echo(f"Serving {count} events at http://127.0.0.1:{port} — press Ctrl+C to stop.")
+        try:
+            server.serve_forever()
+        except KeyboardInterrupt:
+            typer.echo("\nLocal dashboard stopped.")

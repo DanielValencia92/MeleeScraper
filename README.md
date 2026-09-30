@@ -31,13 +31,15 @@ swu-play build-site
 
 The generic parser records Open Graph, JSON-LD, page title, visible text, and public event URLs. A source-specific adapter may later extract stronger fields from stable public HTML or documented public feeds. Do not add authenticated, private, or speculative endpoints.
 
-## Public dashboard / GitHub Pages
+## Local dashboard
 
-`swu-play build-site` writes `site/data/events.json` and `site/data/summary.json`. The static dashboard in `site/` reads those files entirely in the browser, so it can be hosted on GitHub Pages with no server, keys, or scraping capability.
+`swu-play serve` rebuilds `site/data/events.json` and `site/data/summary.json`, then starts a local dashboard at [http://127.0.0.1:8000](http://127.0.0.1:8000). It only serves data from your local SQLite database; it does not perform collection itself.
 
-For GitHub Pages, publish the `site/` directory using GitHub Actions or your preferred Pages deployment workflow. Commit generated `site/data/*.json` only when you want the current research snapshot public; raw captures and the SQLite database are ignored by default.
+```powershell
+swu-play serve
+```
 
-This repository includes `.github/workflows/deploy-pages.yml`. After pushing the project, choose **GitHub Actions** as the repository's Pages source in Settings → Pages. The workflow deploys on pushes to `main` that change `site/`, or manually from the Actions tab. GitHub's recommended Pages workflow uses `configure-pages`, `upload-pages-artifact`, and `deploy-pages`; this implementation follows that pattern.
+Use `--port` to select another local port. Press `Ctrl+C` to stop the server. `build-site` remains available if you simply want to regenerate the dashboard JSON without starting a server. Raw captures and the SQLite database are ignored by default.
 
 ## Data boundaries
 
