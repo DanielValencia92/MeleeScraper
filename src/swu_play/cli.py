@@ -7,7 +7,7 @@ import socketserver
 import httpx
 import typer
 
-from .crawl import crawl_pending, import_url_values, import_urls
+from .crawl import crawl_pending, enrich_melee_venues, import_url_values, import_urls, reparse_archived
 from .exports import export_csv, quality_report, write_site_data
 from .melee import MeleePublicDiscovery
 
@@ -59,6 +59,24 @@ def crawl(
     if delay < 1:
         raise typer.BadParameter("Use a delay of at least one second for respectful collection.")
     typer.echo(json.dumps(crawl_pending(db, raw_dir, delay, refresh, limit), indent=2))
+
+
+@app.command()
+def reparse(db: Path = DEFAULT_DB) -> None:
+    """Rebuild records from saved HTML after improving a parser."""
+    typer.echo(json.dumps(reparse_archived(db), indent=2))
+
+
+@app.command("enrich-venues")
+def enrich_venues(
+    db: Path = DEFAULT_DB,
+    delay: float = 5.0,
+    limit: int | None = typer.Option(None, "--limit", min=1),
+) -> None:
+    """Add city/region/country from public Melee venue cards; no contact data is stored."""
+    if delay < 5:
+        raise typer.BadParameter("Melee's published crawl delay is five seconds.")
+    typer.echo(json.dumps(enrich_melee_venues(db, delay, limit), indent=2))
 
 
 @app.command("report-quality")

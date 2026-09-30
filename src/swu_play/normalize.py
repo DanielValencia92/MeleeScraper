@@ -1,5 +1,5 @@
 def normalize_format(*values: str | None) -> str:
-    """Conservatively classify a public event label without inventing missing data."""
+    """Classify explicit event-format labels without inferring from organizer text."""
     text = " ".join(value for value in values if value).casefold()
     if "eternal" in text:
         return "Eternal"
@@ -12,4 +12,3 @@ def normalize_format(*values: str | None) -> str:
     if "premier" in text:
         return "Premier"
     return "Unknown"
-

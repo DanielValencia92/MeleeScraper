@@ -29,6 +29,14 @@ CREATE TABLE IF NOT EXISTS melee_organizations (
     last_scanned_at TEXT,
     error TEXT
 );
+CREATE TABLE IF NOT EXISTS melee_venues (
+    venue_id INTEGER PRIMARY KEY,
+    name TEXT,
+    city TEXT,
+    region TEXT,
+    country TEXT,
+    fetched_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
 """
 
 

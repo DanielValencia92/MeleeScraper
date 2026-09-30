@@ -29,7 +29,7 @@ swu-play serve
 
 Start with `--max-organizations 10` to validate the results. The first run caches Melee's public organization directory, then scans a bounded number of organizations in descending activity order. It resumes from its SQLite queue in later runs. The adapter filters the public tournament listings to SWU and an optional inclusive date window; it does not use Melee's authenticated API or access participant-level information. Both discovery and crawling use Melee's published five-second crawl delay, archive the response body, and skip unchanged successful records on subsequent runs. Use `crawl --limit 100` for a bounded detail-page batch, or `--refresh` only when you deliberately want a new capture.
 
-The generic parser records Open Graph, JSON-LD, page title, visible text, and public event URLs. The Melee discovery adapter is based on the same unauthenticated organization and tournament listings used by Melee's public pages. Do not add authenticated, private, or speculative endpoints.
+The generic parser records Open Graph, JSON-LD, page title, visible text, and public event URLs. For Melee tournament pages it also reads the public headline's declared format and enrolled-player count. Run `swu-play reparse` after upgrading the parser to update already-saved pages without refetching them. `swu-play enrich-venues` reads the city, region, and country from Melee's browser-visible public venue card; it caches venue results and deliberately discards address, email, phone, and other contact fields. Do not add authenticated, private, or speculative endpoints.
 
 ## Local dashboard
 
