@@ -28,7 +28,7 @@ def quality_report(db_path: Path) -> dict:
     rows = event_rows(db_path)
     total = len(rows)
     fields = ["name", "game", "format_raw", "city", "country", "player_count"]
-    missing = {field: sum(not row.get(field) for row in rows) for field in fields}
+    missing = {field: sum(row.get(field) is None for row in rows) for field in fields}
     totals.update({"parsed_events": total, "missing": missing, "formats": dict(Counter(row["format_norm"] for row in rows))})
     return totals
 
@@ -41,4 +41,3 @@ def write_site_data(db_path: Path, site_dir: Path) -> tuple[int, dict]:
     (data_dir / "events.json").write_text(json.dumps(rows, indent=2), encoding="utf-8")
     (data_dir / "summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
     return len(rows), summary
-
