@@ -1,0 +1,15 @@
+{
+  "discovered": 0,
+  "succeeded": null,
+  "failed": null,
+  "parsed_events": 0,
+  "missing": {
+    "name": 0,
+    "game": 0,
+    "format_raw": 0,
+    "city": 0,
+    "country": 0,
+    "player_count": 0
+  },
+  "formats": {}
+}

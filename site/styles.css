@@ -1,0 +1,6 @@
+:root { color-scheme: dark; font-family: system-ui, sans-serif; background: #101827; color: #e5edf8; }
+body { margin: 0; } main { max-width: 1100px; margin: 0 auto; padding: 4rem 1.5rem; }
+h1 { font-size: clamp(2.5rem, 8vw, 5rem); margin: .1rem 0; letter-spacing: -.06em; } .eyebrow { color: #67e8f9; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; } .intro { font-size: 1.3rem; max-width: 52rem; } .notice { border-left: 3px solid #fbbf24; padding-left: 1rem; color: #cbd5e1; }
+.metrics { display: flex; flex-wrap: wrap; gap: 1rem; margin: 2rem 0; } .metrics article { min-width: 10rem; background: #1e293b; border-radius: .75rem; padding: 1rem; } .metrics strong { display: block; font-size: 2rem; } .metrics span { color: #cbd5e1; }
+.controls { display: flex; flex-wrap: wrap; gap: 1rem; align-items: end; } label { display: grid; gap: .4rem; } input, select { background: #fff; color: #111827; padding: .6rem; border-radius: .35rem; border: 0; min-width: 14rem; } .table-wrap { overflow-x: auto; } table { width: 100%; border-collapse: collapse; } th, td { padding: .75rem; border-bottom: 1px solid #334155; text-align: left; vertical-align: top; } a { color: #67e8f9; }
+
