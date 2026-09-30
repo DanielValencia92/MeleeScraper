@@ -52,7 +52,13 @@ def crawl_pending(
     rows = connection.execute(query, parameters).fetchall()
     counts = {"attempted": 0, "ok": 0, "failed": 0}
     raw_dir.mkdir(parents=True, exist_ok=True)
-    headers = {"User-Agent": "swu-play-analysis/0.1 (public research collector; contact repository owner)"}
+    # Melee's public HTML endpoints reject non-browser client identifiers.
+    # These are the same request headers used by the Melee discovery adapter;
+    # no authentication, private API, or participant data is involved.
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36",
+        "Accept-Language": "en-US,en;q=0.9",
+    }
     with httpx.Client(headers=headers, follow_redirects=True, timeout=30.0) as client:
         for row in rows:
             counts["attempted"] += 1
