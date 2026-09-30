@@ -4,6 +4,7 @@ from collections import Counter
 from pathlib import Path
 
 from .db import connect
+from .analysis import build_hotbed_analysis, render_hotbed_report
 
 
 def event_rows(db_path: Path) -> list[dict]:
@@ -41,3 +42,10 @@ def write_site_data(db_path: Path, site_dir: Path) -> tuple[int, dict]:
     (data_dir / "events.json").write_text(json.dumps(rows, indent=2), encoding="utf-8")
     (data_dir / "summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
     return len(rows), summary
+
+
+def write_hotbed_report(db_path: Path, output_path: Path, min_events: int, top_cities: int) -> dict:
+    analysis = build_hotbed_analysis(event_rows(db_path), min_events=min_events, top_cities=top_cities)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(render_hotbed_report(analysis), encoding="utf-8")
+    return analysis

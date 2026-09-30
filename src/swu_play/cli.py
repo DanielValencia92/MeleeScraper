@@ -8,7 +8,7 @@ import httpx
 import typer
 
 from .crawl import crawl_pending, enrich_melee_venues, import_url_values, import_urls, reparse_archived
-from .exports import export_csv, quality_report, write_site_data
+from .exports import export_csv, quality_report, write_hotbed_report, write_site_data
 from .melee import MeleePublicDiscovery
 
 app = typer.Typer(help="Collect and publish public SWU event research data.")
@@ -89,6 +89,18 @@ def report_quality(db: Path = DEFAULT_DB) -> None:
 def export(output: Path, db: Path = DEFAULT_DB) -> None:
     """Export normalized records to CSV."""
     typer.echo(f"Wrote {export_csv(db, output)} records to {output}.")
+
+
+@app.command()
+def analyze(
+    output: Path = Path("data/reports/regional_hotbeds.md"),
+    db: Path = DEFAULT_DB,
+    min_events: int = typer.Option(2, "--min-events", min=1),
+    top_cities: int = typer.Option(5, "--top-cities", min=1),
+) -> None:
+    """Write country → region → city hotbed rankings from the local dataset."""
+    analysis = write_hotbed_report(db, output, min_events, top_cities)
+    typer.echo(f"Wrote {len(analysis['countries'])} country summaries to {output}.")
 
 
 @app.command("build-site")

@@ -41,6 +41,16 @@ swu-play serve
 
 Use `--port` to select another local port. Press `Ctrl+C` to stop the server. `build-site` remains available if you simply want to regenerate the dashboard JSON without starting a server. Raw captures and the SQLite database are ignored by default.
 
+## Regional analysis
+
+The dashboard is an audit view. Use the analysis report for the research-facing summary:
+
+```powershell
+swu-play analyze
+```
+
+It writes `data/reports/regional_hotbeds.md`, grouped as country → region → city, and ranks cities by observed events and enrolled player-entries. It treats city labels conservatively: superficial case, accent, and whitespace variants are grouped, while the most common original label is displayed. Adjust the threshold or number of cities shown with `--min-events` and `--top-cities`.
+
 ## Data boundaries
 
 - Public event-level information only.
